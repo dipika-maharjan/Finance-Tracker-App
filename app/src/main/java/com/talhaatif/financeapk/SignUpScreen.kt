@@ -13,10 +13,13 @@ import android.provider.MediaStore
 import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.toBitmap
+import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.talhaatif.financeapk.databinding.ActivitySignUpScreenBinding
 import com.talhaatif.financeapk.firebase.Variables.Companion.db
+import com.talhaatif.financeapk.firebase.Variables.Companion.auth
+import com.talhaatif.financeapk.firebase.Variables.Companion.storageRef
 import com.talhaatif.financeapk.firebase.Variables.Companion.displayErrorMessage
 import com.talhaatif.financeapk.firebase.Variables.Companion.isEmailValid
 import java.io.ByteArrayOutputStream
@@ -26,8 +29,6 @@ class SignUpScreen : AppCompatActivity() {
     private lateinit var binding: ActivitySignUpScreenBinding
     private val pickImageData = 1
     private var imgChange = true
-    private lateinit var auth: FirebaseAuth
-    private val storageRef = FirebaseStorage.getInstance().reference
     private lateinit var progressDialog: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,9 +40,9 @@ class SignUpScreen : AppCompatActivity() {
         progressDialog.setMessage("Loading...")
 
         // Set up the currency selector
-        val currencies = arrayOf("USD", "EUR", "PKR", "GBP", "INR")
-        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, currencies)
-        binding.currencySelector.setAdapter(adapter)
+        val currencies = listOf("USD", "EUR", "PKR", "INR", "GBP")
+        val adapter = ArrayAdapter(this, R.layout.dropdown_menu_popup_item, currencies)
+        (binding.currencySelector as? MaterialAutoCompleteTextView)?.setAdapter(adapter)
 
         binding.register.setOnClickListener {
             if (binding.email.text!!.isEmpty() || binding.password.text!!.isEmpty() || binding.name.text!!.isEmpty() ||
