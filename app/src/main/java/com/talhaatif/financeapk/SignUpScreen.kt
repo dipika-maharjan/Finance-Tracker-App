@@ -17,6 +17,7 @@ import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.talhaatif.financeapk.databinding.ActivitySignUpScreenBinding
+import com.talhaatif.financeapk.firebase.Util
 import com.talhaatif.financeapk.firebase.Variables.Companion.db
 import com.talhaatif.financeapk.firebase.Variables.Companion.auth
 import com.talhaatif.financeapk.firebase.Variables.Companion.storageRef
@@ -29,6 +30,7 @@ class SignUpScreen : AppCompatActivity() {
     private lateinit var binding: ActivitySignUpScreenBinding
     private val pickImageData = 1
     private var imgChange = true
+    private val utils = Util()
     private lateinit var progressDialog: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,31 +99,50 @@ class SignUpScreen : AppCompatActivity() {
             storageRef.child("users/$uid").downloadUrl
         }.addOnCompleteListener { task ->
             if (task.isSuccessful) {
+                val downloadUri = task.result.toString()
                 val user = hashMapOf(
                     "uid" to uid,
                     "name" to binding.name.text.toString(),
                     "email" to binding.email.text.toString(),
                     "currency" to binding.currencySelector.text.toString(),
-                    "image" to task.result.toString()
+                    "image" to downloadUri
                 )
+
+                // Save user details
                 db.collection("users")
-                    .add(user)
+                    .document(uid) // using uid as document ID for better management
+                    .set(user)
                     .addOnSuccessListener {
+                        utils.saveLocalData(this, "currency", binding.currencySelector.text.toString())
+                        val budget = hashMapOf(
+                            "uid" to uid,
+                            "balance" to 0.0,
+                            "income" to 0.0,
+                            "expense" to 0.0
+                        )
+
+
                         progressDialog.dismiss()
                         val intent = Intent(this, LoginActivity::class.java)
                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(intent)
                         finish()
+
+
                     }
-                    .addOnFailureListener {
+                    .addOnFailureListener { e ->
                         progressDialog.dismiss()
-                        displayErrorMessage("Error saving UID",this)
+                        displayErrorMessage("Error saving UID: ${e.message}", this)
                     }
+            } else {
+                displayErrorMessage("Error retrieving image URL", this)
+                progressDialog.dismiss()
             }
-        }.addOnFailureListener {
-            displayErrorMessage("Error uploading image",this)
+        }.addOnFailureListener { e ->
+            displayErrorMessage("Error uploading image: ${e.message}", this)
             progressDialog.dismiss()
         }
+
     }
 
     private fun getImageUri(inImage: Bitmap): Uri {

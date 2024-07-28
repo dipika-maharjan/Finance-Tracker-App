@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="10dp">
 
         <ImageView
             android:layout_width="100dp"
@@ -51,7 +51,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="13dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/name"
@@ -64,7 +64,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="13dp"
             tools:ignore="TouchTargetSizeCheck" >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -79,7 +79,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="13dp"
             >
 
             <com.google.android.material.textfield.TextInputEditText
@@ -94,7 +94,7 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="13dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/conpassword"
@@ -109,7 +109,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="13dp">
 
             <AutoCompleteTextView
                 android:id="@+id/currency_selector"
@@ -127,7 +127,7 @@
             android:text="@string/register"
             android:textSize="20sp"
             android:fontFamily="@font/poppins_bold"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="13dp" />
 
         <View
             android:layout_width="match_parent"
@@ -140,6 +140,6 @@
             android:layout_height="wrap_content"
             android:text="@string/already_have_account"
             android:layout_gravity="center"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="13dp" />
     </LinearLayout>
 </ScrollView>

@@ -15,6 +15,9 @@
         android:theme="@style/Theme.FinanceApk"
         tools:targetApi="31">
         <activity
+            android:name=".AddTransactions"
+            android:exported="false" />
+        <activity
             android:name=".SplashScreen"
             android:exported="true">
             <intent-filter>
@@ -31,7 +34,7 @@
             android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="false"/>
+            android:exported="false" />
     </application>
 
 </manifest>
