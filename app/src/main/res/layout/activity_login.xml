@@ -14,9 +14,9 @@
         android:orientation="vertical">
 
         <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:src="@drawable/logo"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:src="@drawable/budgeting"
             android:layout_gravity="center"
             tools:ignore="ContentDescription" />
 

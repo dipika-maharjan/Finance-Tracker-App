@@ -1,5 +1,6 @@
 package com.talhaatif.financeapk
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -60,7 +61,7 @@ class AnalysisFragment : Fragment() {
     private fun setupPieChart(entries: List<PieEntry>) {
         val dataSet = PieDataSet(entries, "\nBudget Analysis")
         dataSet.colors = ColorTemplate.COLORFUL_COLORS.toList()
-
+        dataSet.valueTypeface = Typeface.DEFAULT_BOLD
         val data = PieData(dataSet)
         data.setValueTextSize(16f)
         data.setValueTextColor(resources.getColor(android.R.color.black, null))
@@ -82,13 +83,48 @@ class AnalysisFragment : Fragment() {
     private fun setupDatePicker() {
         binding.datePickerLayout.setOnClickListener {
             val datePicker = DatePickerFragment { year, month, day ->
-
                 val calendar = Calendar.getInstance()
                 calendar.set(year, month, day)
                 val selectedDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.time)
                 binding.tvSelectDate.text = selectedDate
+
+                fetchTransactionsAndSetupPieChart(selectedDate)
             }
             datePicker.show(childFragmentManager, "datePicker")
         }
     }
+
+    private fun fetchTransactionsAndSetupPieChart(selectedDate: String) {
+        val userId = Util().getLocalData(requireContext(), "uid")
+
+        db.collection("transactions")
+            .whereEqualTo("uid", userId)
+            .whereEqualTo("transDate", selectedDate)
+            .get()
+            .addOnSuccessListener { documents ->
+                val entries = mutableListOf<PieEntry>()
+                var totalIncome = 0f
+                var totalExpense = 0f
+                for (document in documents) {
+                    val transType = document.getString("transType")
+                    val transAmount = document.getString("transAmount")?.split(" ")?.first()?.toFloatOrNull() ?: 0f
+                    if (transType == "Income") {
+                        totalIncome += transAmount
+                    } else if (transType == "Expense") {
+                        totalExpense += transAmount
+                    }
+                }
+                if (totalIncome > 0) {
+                    entries.add(PieEntry(totalIncome, "Income"))
+                }
+                if (totalExpense > 0) {
+                    entries.add(PieEntry(totalExpense, "Expense"))
+                }
+                setupPieChart(entries)
+            }
+            .addOnFailureListener { exception ->
+                Log.w("AnalysisFragment", "Error getting transactions: ", exception)
+            }
+    }
+
 }

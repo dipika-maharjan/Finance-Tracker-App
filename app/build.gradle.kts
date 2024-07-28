@@ -46,6 +46,8 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    implementation (libs.glide)
+    annotationProcessor (libs.compiler)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.firebase.firestore)

@@ -38,30 +38,7 @@
             android:fontFamily="@font/poppins_medium" />
     </LinearLayout>
 
-    <!-- Select Year Button -->
-    <Button
-        android:id="@+id/btnSelectYear"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Select Year"
-        android:layout_marginBottom="8dp"
-        android:backgroundTint="@color/blue_500"
-        android:textColor="@android:color/white"
-        android:fontFamily="@font/poppins_medium"
-        android:elevation="2dp"
-        android:padding="12dp" />
 
-    <!-- Select Month Button -->
-    <Button
-        android:id="@+id/btnSelectMonth"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Select Month"
-        android:backgroundTint="@color/blue_500"
-        android:textColor="@android:color/white"
-        android:fontFamily="@font/poppins_medium"
-        android:elevation="2dp"
-        android:padding="12dp" />
 
     <!-- Bar Chart -->
     <com.github.mikephil.charting.charts.PieChart
