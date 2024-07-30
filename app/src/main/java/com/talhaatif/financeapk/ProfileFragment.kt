@@ -23,11 +23,15 @@ import com.talhaatif.financeapk.firebase.Variables.Companion.auth
 import com.talhaatif.financeapk.firebase.Variables.Companion.db
 import com.talhaatif.financeapk.firebase.Variables.Companion.storageRef
 import java.io.ByteArrayOutputStream
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
+import com.google.android.material.textfield.MaterialAutoCompleteTextView
 
 class ProfileFragment : Fragment() {
 
     private lateinit var binding: FragmentProfileBinding
     private lateinit var progressDialog: ProgressDialog
+    private val utils = Util()
     private var imgChange = false
 
     override fun onCreateView(
@@ -49,7 +53,7 @@ class ProfileFragment : Fragment() {
     }
 
     private fun fetchUserProfile() {
-        val userId = auth.currentUser?.uid ?: return
+        val userId = Util().getLocalData(requireContext(),"uid") ?: return
 
         db.collection("users").document(userId).get()
             .addOnSuccessListener { document ->
@@ -60,8 +64,19 @@ class ProfileFragment : Fragment() {
                     val profilePictureUrl = document.getString("image") ?: ""
 
                     binding.name.setText(name)
-                    binding.email.setText(email)
-                    binding.currencySelector.setText(currency, false)
+                    val baseCurrencies = listOf("USD", "EUR", "PKR", "INR", "GBP").toMutableList()
+
+                    if (baseCurrencies.contains(currency)) {
+                        val index = baseCurrencies.indexOf(currency)
+                        baseCurrencies[index] = baseCurrencies[0]
+                    }
+                    baseCurrencies[0] = currency
+
+                    val adapter = ArrayAdapter(requireContext(), R.layout.dropdown_menu_popup_item, baseCurrencies)
+                    val autoCompleteTextView = binding.currencySelector as? AutoCompleteTextView
+                    autoCompleteTextView?.setAdapter(adapter)
+                    autoCompleteTextView?.setText(currency, false)
+
 
                     // Load profile picture using Glide
                     Glide.with(this)
@@ -75,17 +90,16 @@ class ProfileFragment : Fragment() {
     }
 
     private fun setupUpdateButton() {
+        progressDialog.setMessage("Updating...")
         binding.update.setOnClickListener {
             progressDialog.show()
 
             val userId = auth.currentUser?.uid ?: return@setOnClickListener
             val updatedName = binding.name.text.toString()
-            val updatedEmail = binding.email.text.toString()
             val updatedCurrency = binding.currencySelector.text.toString()
 
             val userUpdates = hashMapOf(
                 "name" to updatedName,
-                "email" to updatedEmail,
                 "currency" to updatedCurrency
             )
 
@@ -103,6 +117,8 @@ class ProfileFragment : Fragment() {
                     if (task.isSuccessful) {
                         val downloadUri = task.result.toString()
                         userUpdates["image"] = downloadUri
+
+                        utils.saveLocalData(requireContext(),"currency",updatedCurrency)
 
                         updateUserInFirestore(userId, userUpdates)
                     } else {
@@ -132,9 +148,8 @@ class ProfileFragment : Fragment() {
     private fun setupLogoutButton() {
         binding.logout.setOnClickListener {
             auth.signOut()
-            val util = Util()
-            util.saveLocalData(requireContext(),"auth","false")
-            util.saveLocalData(requireContext(), "uid", "-1")
+            utils.saveLocalData(requireContext(),"auth","false")
+            utils.saveLocalData(requireContext(), "uid", "-1")
             val intent = Intent(requireContext(), LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
