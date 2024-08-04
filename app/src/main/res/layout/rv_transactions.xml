@@ -18,7 +18,8 @@
             android:id="@+id/transactionView"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/avatar" />
+            android:padding="10sp"
+            android:src="@drawable/resource_import" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"

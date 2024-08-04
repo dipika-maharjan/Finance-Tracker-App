@@ -33,43 +33,50 @@ class HomeFragment : Fragment() {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
+    private fun checkAllParameters(): Boolean {
+        return isAdded && context != null
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (checkAllParameters()) {
 
-        progressDialog = ProgressDialog(requireContext())
-        progressDialog.setMessage("Initializing Account !!!")
+            progressDialog = ProgressDialog(requireContext())
+            progressDialog.setMessage("Fetching Account Updates!!!")
 
-         userId = utils.getLocalData(requireContext(), "uid")
+            userId = utils.getLocalData(requireContext(), "uid")
 
-        binding.fab.setOnClickListener {
+            binding.fab.setOnClickListener {
 
-            val intent = Intent(requireActivity(), AddTransactions::class.java)
-            startActivity(intent)
+                val intent = Intent(requireActivity(), AddTransactions::class.java)
+                startActivity(intent)
+
+            }
+            updateBudgetViews()
+
+            db.collection("transactions")
+                .whereEqualTo("uid", userId)
+                .get()
+                .addOnSuccessListener { result ->
+                    val transactions = mutableListOf<Transaction>()
+                    for (document in result) {
+                        transactions.add(document.toObject(Transaction::class.java))
+                    }
+                    setupRecyclerView(transactions)
+                }
+                .addOnFailureListener { e ->
+                    // Handle error
+                }
 
         }
-        updateBudgetViews()
-
-        db.collection("transactions")
-            .whereEqualTo("uid", userId)
-            .get()
-            .addOnSuccessListener { result ->
-                val transactions = mutableListOf<Transaction>()
-                for (document in result) {
-                    transactions.add(document.toObject(Transaction::class.java))
-                }
-                setupRecyclerView(transactions)
-            }
-            .addOnFailureListener { e ->
-                // Handle error
-            }
-
 
     }
 
     private fun setupRecyclerView(transactions: List<Transaction>) {
-        binding.transactions.layoutManager = LinearLayoutManager(requireContext())
-        binding.transactions.adapter = TransactionsAdapter(transactions)
+        if( isAdded && context != null) {
+            binding.transactions.layoutManager = LinearLayoutManager(requireContext())
+            binding.transactions.adapter = TransactionsAdapter(transactions, requireContext())
+        }
     }
 
     private fun updateBudgetViews() {

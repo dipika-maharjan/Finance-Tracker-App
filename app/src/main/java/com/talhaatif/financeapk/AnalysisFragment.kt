@@ -28,9 +28,20 @@ class AnalysisFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentAnalysisBinding.inflate(inflater, container, false)
-        setupDatePicker()
-        fetchTransactionsAndSetupPieChart()
+
         return binding.root
+    }
+    private fun checkAllParameters(): Boolean {
+        return isAdded && context != null
+    }
+
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if (checkAllParameters()) {
+            setupDatePicker()
+            fetchTransactionsAndSetupPieChart()
+        }
     }
 
     private fun fetchTransactionsAndSetupPieChart() {
@@ -51,7 +62,10 @@ class AnalysisFragment : Fragment() {
                         entries.add(PieEntry(expense, "Expense"))
                     }
                 }
-                setupPieChart(entries)
+                if (isAdded) {
+                    setupPieChart(entries)
+                }
+
             }
             .addOnFailureListener { exception ->
                 Log.w("AnalysisFragment", "Error getting budget: ", exception)
@@ -59,6 +73,7 @@ class AnalysisFragment : Fragment() {
     }
 
     private fun setupPieChart(entries: List<PieEntry>) {
+        if (!isAdded) return
         val dataSet = PieDataSet(entries, "\nBudget Analysis")
         dataSet.colors = ColorTemplate.COLORFUL_COLORS.toList()
         dataSet.valueTypeface = Typeface.DEFAULT_BOLD
@@ -81,6 +96,7 @@ class AnalysisFragment : Fragment() {
     }
 
     private fun setupDatePicker() {
+        if (!isAdded) return
         binding.datePickerLayout.setOnClickListener {
             val datePicker = DatePickerFragment { year, month, day ->
                 val calendar = Calendar.getInstance()

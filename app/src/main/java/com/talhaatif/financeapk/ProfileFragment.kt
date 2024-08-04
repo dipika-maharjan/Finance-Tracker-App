@@ -25,7 +25,7 @@ import com.talhaatif.financeapk.firebase.Variables.Companion.storageRef
 import java.io.ByteArrayOutputStream
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
-import com.google.android.material.textfield.MaterialAutoCompleteTextView
+
 
 class ProfileFragment : Fragment() {
 
@@ -39,27 +39,37 @@ class ProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentProfileBinding.inflate(inflater, container, false)
-        progressDialog = ProgressDialog(requireContext())
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        fetchUserProfile()
-        setupUpdateButton()
-        setupLogoutButton()
-        setupImagePicker()
+        if ( checkAllParameters() ) {
+            progressDialog = ProgressDialog(requireContext())
+            progressDialog.setMessage("Fetching profile...")
+            progressDialog.show()
+            if (isAdded && context != null) {
+                fetchUserProfile()
+            }
+            progressDialog.dismiss()
+            setupUpdateButton()
+            setupLogoutButton()
+            setupImagePicker()
+        }
+    }
+    private fun checkAllParameters(): Boolean {
+        return isAdded && context != null
     }
 
     private fun fetchUserProfile() {
+        if (isAdded && context!=null) {
         val userId = Util().getLocalData(requireContext(),"uid") ?: return
 
         db.collection("users").document(userId).get()
             .addOnSuccessListener { document ->
                 if (document != null) {
                     val name = document.getString("name") ?: ""
-                    val email = document.getString("email") ?: ""
                     val currency = document.getString("currency") ?: ""
                     val profilePictureUrl = document.getString("image") ?: ""
 
@@ -71,25 +81,44 @@ class ProfileFragment : Fragment() {
                         baseCurrencies[index] = baseCurrencies[0]
                     }
                     baseCurrencies[0] = currency
+                    try {
+                        if (context != null) {
+                            val adapter = ArrayAdapter(
+                                requireContext(),
+                                R.layout.dropdown_menu_popup_item,
+                                baseCurrencies
+                            )
+                            val autoCompleteTextView =
+                                binding.currencySelector as? AutoCompleteTextView
+                            autoCompleteTextView?.setAdapter(adapter)
+                            autoCompleteTextView?.setText(currency, false)
+                        }
+                    }
+                    catch(e : Exception){
+                        Log.w("ProfileFragment", "Wait as there is loading ", e)
 
-                    val adapter = ArrayAdapter(requireContext(), R.layout.dropdown_menu_popup_item, baseCurrencies)
-                    val autoCompleteTextView = binding.currencySelector as? AutoCompleteTextView
-                    autoCompleteTextView?.setAdapter(adapter)
-                    autoCompleteTextView?.setText(currency, false)
+                    }
 
 
                     // Load profile picture using Glide
-                    Glide.with(this)
-                        .load(profilePictureUrl)
-                        .into(binding.imageView)
+                    if(isAdded && context!=null) {
+                        Glide.with(this)
+                            .load(profilePictureUrl)
+                            .into(binding.imageView)
+                    }
                 }
             }
             .addOnFailureListener { exception ->
-                Log.w("ProfileFragment", "Error getting user profile: ", exception)
+                if (isAdded && context != null) {
+                    Log.w("ProfileFragment", "Error getting user profile: ", exception)
+                }
+             //   Log.w("ProfileFragment", "Error getting user profile: ", exception)
             }
     }
-
+}
     private fun setupUpdateButton() {
+        if (!isAdded)
+            return
         progressDialog.setMessage("Updating...")
         binding.update.setOnClickListener {
             progressDialog.show()
@@ -146,6 +175,7 @@ class ProfileFragment : Fragment() {
     }
 
     private fun setupLogoutButton() {
+        if (!isAdded) return
         binding.logout.setOnClickListener {
             auth.signOut()
             utils.saveLocalData(requireContext(),"auth","false")
@@ -158,6 +188,7 @@ class ProfileFragment : Fragment() {
     }
 
     private fun setupImagePicker() {
+        if (!isAdded) return
         binding.imageView.setOnClickListener {
             val intent = Intent(Intent.ACTION_PICK)
             intent.type = "image/*"
@@ -177,6 +208,7 @@ class ProfileFragment : Fragment() {
     }
 
     private fun getImageUri(inImage: Bitmap): Uri {
+
         val bytes = ByteArrayOutputStream()
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
         val path = MediaStore.Images.Media.insertImage(requireActivity().contentResolver, inImage, "Title", null)
