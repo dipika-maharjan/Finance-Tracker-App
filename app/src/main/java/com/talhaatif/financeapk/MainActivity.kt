@@ -15,11 +15,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Set up BottomNavigationView
-        binding.bottomNavigation.setOnNavigationItemSelectedListener { item ->
+        binding.bottomNavigationView.setOnNavigationItemSelectedListener { item ->
             var selectedFragment: Fragment? = null
             when (item.itemId) {
                 R.id.navigation_home -> selectedFragment = HomeFragment()
-                R.id.navigation_analysis -> selectedFragment = AnalysisFragment()
+                R.id.navigation_transactions -> selectedFragment = TransactionsListFragment()
                 R.id.navigation_profile -> selectedFragment = ProfileFragment()
             }
             if (selectedFragment != null) {

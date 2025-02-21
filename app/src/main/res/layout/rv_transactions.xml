@@ -6,7 +6,8 @@
     android:layout_height="wrap_content"
     android:layout_margin="10dp"
     app:cardCornerRadius="10dp"
-    android:elevation="5dp">
+    android:elevation="5dp"
+    android:backgroundTint="?attr/colorSurface">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,7 +20,8 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:padding="10sp"
-            android:src="@drawable/resource_import" />
+            android:src="@drawable/resource_import"
+            android:backgroundTint="?attr/colorPrimary" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
@@ -34,7 +36,7 @@
                 android:text="Income"
                 android:textSize="16sp"
                 android:fontFamily="@font/poppins_bold"
-                android:textColor="@android:color/black"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -46,7 +48,8 @@
                 android:layout_height="wrap_content"
                 android:text="12000 PKR"
                 android:textSize="14sp"
-                android:fontFamily="@font/poppins_medium"
+                style="@style/TextAppearance.HeadLine1Bold"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/transactionDate" />
@@ -57,7 +60,9 @@
                 android:layout_height="wrap_content"
                 android:text="12-02-2024"
                 android:textSize="14sp"
+                style="@style/TextAppearance.HeadLine2Bold"
                 android:fontFamily="@font/poppins_medium"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/transactionAmount"
                 app:layout_constraintBottom_toBottomOf="parent" />

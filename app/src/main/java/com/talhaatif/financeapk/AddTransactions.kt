@@ -1,144 +1,118 @@
 package com.talhaatif.financeapk
 
+import android.app.DatePickerDialog
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
-import android.widget.RadioButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.tabs.TabLayout
 import com.talhaatif.financeapk.databinding.ActivityAddTransactionsBinding
 import com.talhaatif.financeapk.firebase.Util
-import com.talhaatif.financeapk.firebase.Variables.Companion.db
-import com.talhaatif.financeapk.firebase.Variables.Companion.auth
-import com.talhaatif.financeapk.firebase.Variables.Companion.storageRef
+import com.talhaatif.financeapk.viewmodel.AddTransactionViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
 class AddTransactions : AppCompatActivity() {
-
     private lateinit var binding: ActivityAddTransactionsBinding
+    private lateinit var viewModel: AddTransactionViewModel
     private val utils = Util()
-    private lateinit var progressDialog: ProgressDialog
+    private var selectedDate = ""
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAddTransactionsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        progressDialog = ProgressDialog(this)
-        progressDialog.setMessage("Adding Transaction !!!")
-
-        var selectedDate = ""
-
         // Date picker logic
-        binding.datePickerLayout.setOnClickListener {
-            val datePicker = DatePickerFragment { year, month, day ->
-                val calendar = Calendar.getInstance()
-                calendar.set(year, month, day)
-                selectedDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.time)
-                binding.tvSelectDate.text = selectedDate
-            }
-            datePicker.show(supportFragmentManager, "datePicker")
+        binding.btnDatePicker.setOnClickListener {
+            showDatePicker()
         }
 
-        // Save button click logic
-        binding.btnSave.setOnClickListener {
-            progressDialog.show()
-            val currencyType =  utils.getLocalData(this, "currency")
-            val amount = binding.etAmount.text.toString().trim() + " " + currencyType
-            val selectedTypeId = binding.rgType.checkedRadioButtonId
-            val selectedType = findViewById<RadioButton>(selectedTypeId)?.text.toString()
+        binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                when (tab?.position) {
+                    0 -> { // Expense Tab
+                        binding.tvAmount.text = "-$"
+                        // Change text color of TextView and EditText to red
+                        binding.tvAmount.setTextColor(ContextCompat.getColor(this@AddTransactions, R.color.red))
+                        binding.etAmount.setTextColor(ContextCompat.getColor(this@AddTransactions, R.color.red))
+                        binding.tabLayout.setSelectedTabIndicatorColor(ContextCompat.getColor(this@AddTransactions, R.color.red))
+                        binding.tabLayout.setTabTextColors(
+                            ContextCompat.getColor(this@AddTransactions, R.color.white), // Unselected color
+                            ContextCompat.getColor(this@AddTransactions, R.color.red) // Selected color
+                        )
+                    }
+                    1 -> { // Income Tab
+                        // Change text color of TextView and EditText to green
+                        binding.tvAmount.setTextColor(ContextCompat.getColor(this@AddTransactions, R.color.green))
+                        binding.etAmount.setTextColor(ContextCompat.getColor(this@AddTransactions, R.color.green))
+                        binding.tvAmount.text = "+$"
+                        binding.tabLayout.setSelectedTabIndicatorColor(ContextCompat.getColor(this@AddTransactions, R.color.green))
+                        binding.tabLayout.setTabTextColors(
+                            ContextCompat.getColor(this@AddTransactions, R.color.white), // Unselected color
+                            ContextCompat.getColor(this@AddTransactions, R.color.green) // Selected color
+                        )
+                    }
+                }
+            }
 
-            if (amount.isEmpty() || selectedTypeId == -1 || selectedDate.isEmpty()) {
+            override fun onTabUnselected(tab: TabLayout.Tab?) {}
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        })
+
+
+        viewModel = ViewModelProvider(this).get(AddTransactionViewModel::class.java)
+
+        binding.btnAddRecord.setOnClickListener {
+            val currencyType = utils.getLocalData(this, "currency")
+            val amount = binding.etAmount.text.toString().trim() + " " + currencyType
+            val notes = binding.etNotes.text.toString().trim()
+            val transactionType = if (binding.tabLayout.selectedTabPosition == 0) "Expense" else "Income"
+
+            if (amount.isEmpty() || selectedDate.isEmpty() || transactionType.isEmpty()) {
                 Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+            if (transactionType.isEmpty()) {
+                Toast.makeText(this, "Transaction Type Not Selected", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
-            val userId = utils.getLocalData(this, "uid")
-
-            val transaction = hashMapOf(
-                "uid" to userId,
-                "transAmount" to amount,
-                "transType" to selectedType,
-                "transDate" to selectedDate
-            )
-
-            db.collection("transactions").add(transaction)
-                .addOnSuccessListener {
-
-                    updateBudget(userId, selectedType, amount.split(" ")[0].toDouble())
-                }
-                .addOnFailureListener { e ->
-                    Toast.makeText(this, "Error adding transaction: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
+            viewModel.addTransaction(this, amount, transactionType, selectedDate, notes)
         }
-    }
-    private fun updateBudget(userId: String, transType: String, amount: Double) {
-        val budgetRef = db.collection("budget").document(userId)
 
-        budgetRef.get().addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val document = task.result
-                if (document != null && document.exists()) {
-                    // Document exists, proceed with the transaction
-                    db.runTransaction { transaction ->
-                        val snapshot = transaction.get(budgetRef)
-
-                        val balance = snapshot.getDouble("balance") ?: 0.0
-                        val income = snapshot.getDouble("income") ?: 0.0
-                        val expense = snapshot.getDouble("expense") ?: 0.0
-
-                        val newBalance = if (transType == "Income") {
-                            balance + amount
-                        } else {
-                            balance - amount
-                        }
-
-                        val newIncome = if (transType == "Income") {
-                            income + amount
-                        } else {
-                            income
-                        }
-
-                        val newExpense = if (transType == "Expense") {
-                            expense + amount
-                        } else {
-                            expense
-                        }
-
-                        transaction.update(budgetRef, "balance", newBalance)
-                        transaction.update(budgetRef, "income", newIncome)
-                        transaction.update(budgetRef, "expense", newExpense)
-                    }.addOnSuccessListener {
-                        progressDialog.dismiss()
-                        val intent = Intent(this, MainActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        startActivity(intent)
-                        finish()
-                    }.addOnFailureListener { e ->
-                        Toast.makeText(this, "Error updating budget: ${e.message}", Toast.LENGTH_SHORT).show()
-                    }
-                } else {
-                    // Document does not exist, create it with initial values
-                    val initialBudget = hashMapOf(
-                        "uid" to userId,
-                        "balance" to if (transType == "Income") amount else -amount,
-                        "income" to if (transType == "Income") amount else 0.0,
-                        "expense" to if (transType == "Expense") amount else 0.0
-                    )
-                    budgetRef.set(initialBudget).addOnSuccessListener {
-                        val intent = Intent(this, MainActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        startActivity(intent)
-                        finish()
-                    }.addOnFailureListener { e ->
-                        Toast.makeText(this, "Error creating budget: ${e.message}", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            } else {
-                Toast.makeText(this, "Error fetching budget document: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+        // Observe transaction status
+        viewModel.transactionState.observe(this) { result ->
+            result.onSuccess {
+                Toast.makeText(this, "Transaction added successfully", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this, MainActivity::class.java))
+                finish()
+            }
+            result.onFailure { error ->
+                Toast.makeText(this, "Failed to add transaction: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
+    private fun showDatePicker() {
+        val calendar = Calendar.getInstance()
+        val datePicker = DatePickerDialog(
+            this,
+            { _, year, month, day ->
+                calendar.set(year, month, day)
+                selectedDate =
+                    SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.time)
+                binding.tvDate.text = selectedDate
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        )
+        datePicker.show()
+    }
 }

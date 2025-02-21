@@ -1,156 +1,140 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".AddTransactions"
-   >
+    android:layout_height="wrap_content"
+    android:background="?attr/colorSurface"
+    android:padding="16dp"
+    tools:context=".AddTransactions">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <!-- CardView for Main Container -->
+    <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="6dp"
+        android:background="?attr/colorSurface">
 
-        <!-- Header Image -->
-        <ImageView
-            android:id="@+id/headerImage"
-            android:layout_width="0dp"
-            android:layout_height="200dp"
-            android:src="@drawable/budgeting"
-            android:scaleType="centerInside"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5" />
-
-        <!-- Container for Inputs -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/headerImage"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintWidth_percent="0.9"
-            app:cardElevation="8dp"
-            app:cardCornerRadius="16dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="16dp"
+            android:orientation="vertical"
             android:padding="16dp">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+
+            <!-- Tab Layout for Expense / Income -->
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tabLayout"
                 android:layout_width="match_parent"
-                android:layout_margin="20sp"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:tabIndicatorColor="@color/red"
+                app:tabTextColor="?attr/colorOnSurface"
+                app:tabSelectedTextColor="@color/red">
 
-                <!-- Transaction Amount Input -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/etAmountLayout"
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Expense" />
+
+                <com.google.android.material.tabs.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Income" />
+            </com.google.android.material.tabs.TabLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="32dp"
+                android:layout_gravity="center_horizontal">
+
+                <!-- Amount Display -->
+                <TextView
+                    android:id="@+id/tv_amount"
+                    style="@style/TextAppearance.AmountExpense"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="-$" />
+
+                <EditText
+                    android:id="@+id/etAmount"
+                    style="@style/TextAppearance.AmountExpense"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal"
+                    android:focusable="true"
+                    android:text="130"
+                    android:background="@android:color/transparent" >
+                </EditText>
+
+            </LinearLayout>
+
+
+
+
+            <Spinner
+                android:id="@+id/spinner_category"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:visibility="gone"
+                android:background="@drawable/spinner_background"
+                tools:listitem="@layout/item_category"
+                android:padding="8dp" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="32dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/tv_date"
+                    style="@style/TextAppearance.Input"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:hint="Enter Amount"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    app:layout_constraintWidth_percent="0.9"
-                    app:boxStrokeColor="@color/blue_500"
-                    app:boxStrokeWidth="2dp">
+                    android:layout_weight="1"
+                    android:text="Selected Date" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etAmount"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="numberDecimal"
-                        android:padding="12dp" />
-                </com.google.android.material.textfield.TextInputLayout>
+                <ImageView
+                    android:id="@+id/btn_date_picker"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_baseline_calendar_month_24"
+                    app:tint="?attr/colorOnSurface" />
+            </LinearLayout>
 
-                <!-- Income or Expense Radio Group -->
-                <RadioGroup
-                    android:id="@+id/rgType"
-                    android:layout_width="0dp"
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter Notes"
+                android:layout_marginTop="32dp"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_notes"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:layout_constraintTop_toBottomOf="@id/etAmountLayout"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintWidth_percent="0.9">
+                    android:textColorHint="@color/red"
+                    style="@style/TextAppearance.Input"/>
+            </com.google.android.material.textfield.TextInputLayout>
 
-                    <RadioButton
-                        android:id="@+id/rbIncome"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Income"
-                        android:padding="12dp"
-                        android:buttonTint="@color/blue_500" />
 
-                    <RadioButton
-                        android:id="@+id/rbExpense"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Expense"
-                        android:padding="12dp"
-                        android:buttonTint="@color/blue_500" />
-                </RadioGroup>
+            <!-- Add Record Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_add_record"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="Add Record"
+                style="@style/Widget.MaterialComponents.Button" />
 
-                <!-- Date Picker with Icon -->
-                <LinearLayout
-                    android:id="@+id/datePickerLayout"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="@drawable/bg_date_picker"
-                    android:padding="12dp"
-                    app:layout_constraintTop_toBottomOf="@id/rgType"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintWidth_percent="0.9">
-
-                    <ImageView
-                        android:id="@+id/ivDateIcon"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_date"
-                        app:tint="@color/blue_500" />
-
-                    <TextView
-                        android:id="@+id/tvSelectDate"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Select Date"
-                        android:paddingStart="8dp"
-                        android:textColor="@color/blue_500"
-                        android:textSize="16sp" />
-                </LinearLayout>
-
-                <!-- Save Button -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnSave"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:text="Save"
-                    android:padding="12dp"
-                    android:textColor="@android:color/white"
-                    android:textSize="20sp"
-                    android:fontFamily="@font/poppins_bold"
-                    android:layout_marginEnd="10sp"
-                    android:layout_marginStart="10sp"
-                    android:layout_marginBottom="5sp"
-                    app:cornerRadius="12dp"
-                    app:backgroundTint="@color/blue_500"
-                    app:layout_constraintTop_toBottomOf="@id/datePickerLayout"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.5"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintWidth_percent="0.9" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </androidx.cardview.widget.CardView>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

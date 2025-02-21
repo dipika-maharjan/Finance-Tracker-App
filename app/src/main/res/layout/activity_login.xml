@@ -50,6 +50,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/enter_your_email"
+                style="@style/TextAppearance.Input"
+                android:textColor="@color/white"
                 android:inputType="textEmailAddress"
                 tools:ignore="TouchTargetSizeCheck" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -64,6 +66,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/enter_your_password"
+                style="@style/TextAppearance.Input"
                 android:inputType="textPassword"
                 tools:ignore="TouchTargetSizeCheck" />
         </com.google.android.material.textfield.TextInputLayout>

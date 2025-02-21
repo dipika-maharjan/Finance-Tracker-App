@@ -45,6 +45,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.androidx.appcompat)
+    implementation ("androidx.fragment:fragment-ktx:1.6.1")
     implementation(libs.material)
     implementation (libs.glide)
     annotationProcessor (libs.compiler)
