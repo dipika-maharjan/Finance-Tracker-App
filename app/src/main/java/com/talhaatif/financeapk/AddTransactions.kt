@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.tabs.TabLayout
 import com.talhaatif.financeapk.databinding.ActivityAddTransactionsBinding
 import com.talhaatif.financeapk.firebase.Util
@@ -100,19 +101,22 @@ class AddTransactions : AppCompatActivity() {
     }
 
     private fun showDatePicker() {
-        val calendar = Calendar.getInstance()
-        val datePicker = DatePickerDialog(
-            this,
-            { _, year, month, day ->
-                calendar.set(year, month, day)
-                selectedDate =
-                    SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.time)
-                binding.tvDate.text = selectedDate
-            },
-            calendar.get(Calendar.YEAR),
-            calendar.get(Calendar.MONTH),
-            calendar.get(Calendar.DAY_OF_MONTH)
-        )
-        datePicker.show()
+        val datePicker =
+            MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Select Date")
+                .setSelection(MaterialDatePicker.todayInUtcMilliseconds()) // Default selection to today
+                .build()
+
+        datePicker.addOnPositiveButtonClickListener { selection ->
+            val calendar = Calendar.getInstance().apply {
+                timeInMillis = selection
+            }
+
+            selectedDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.time)
+            binding.tvDate.text = selectedDate
+        }
+
+        datePicker.show(supportFragmentManager, "DATE_PICKER")
     }
+
 }

@@ -12,6 +12,7 @@ import com.talhaatif.financeapk.firebase.Util
 import com.talhaatif.financeapk.firebase.Variables
 import java.io.ByteArrayOutputStream
 import android.provider.MediaStore
+import android.util.Log
 
 class ProfileViewModel(application: Application) : AndroidViewModel(application) {
     private val db = Variables.db
@@ -27,6 +28,17 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
 
     private val _updateSuccess = MutableLiveData<Boolean>()
     val updateSuccess: LiveData<Boolean> get() = _updateSuccess
+
+    fun logout(){
+        Util().saveLocalData(getApplication(), "uid", "")
+        Util().saveLocalData(getApplication(), "auth", "false")
+        Util().saveLocalData(getApplication(),"currency","")
+        auth.signOut()
+    }
+
+    fun getCurrency() : String?{
+        return utils.getLocalData(getApplication(),"currency")
+    }
 
     fun fetchUserProfile() {
         val userId = utils.getLocalData(getApplication(), "uid") ?: return
@@ -57,12 +69,15 @@ class ProfileViewModel(application: Application) : AndroidViewModel(application)
                 if (task.isSuccessful) {
                     userUpdates["image"] = task.result.toString()
                     saveToFirestore(userId, userUpdates)
+                    utils.saveLocalData(getApplication(), "currency", currency)
+//                    Log.d("ProfileViewModel", "Currency saved: ${utils.getLocalData(getApplication(),"currency")}")
                 } else {
                     _updateSuccess.value = false
                 }
             }
         } else {
             saveToFirestore(userId, userUpdates)
+            utils.saveLocalData(getApplication(), "currency", currency)
         }
     }
 

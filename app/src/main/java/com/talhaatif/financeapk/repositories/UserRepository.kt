@@ -28,8 +28,8 @@ class UserRepository {
         password: String,
         name: String,
         currency: String,
-        imageUri: Uri,
-        bitmap: Bitmap
+        imageUri: Uri?,
+        bitmap: Bitmap?
     ) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
@@ -41,18 +41,20 @@ class UserRepository {
                 }
             }
     }
-
     private fun saveUserToFirestore(
         context: Context,
         uid: String,
         email: String,
         name: String,
         currency: String,
-        imageUri: Uri,
-        bitmap: Bitmap
+        imageUri: Uri?,
+        bitmap: Bitmap?
     ) {
+        // If no image is selected, use a random avatar
+        val finalImageUri = imageUri ?: Variables.getRandomAvatar(context)
+
         val storageRef = storageRef.child("users/$uid")
-        val uploadTask = storageRef.putFile(imageUri)
+        val uploadTask = storageRef.putFile(finalImageUri)
 
         uploadTask.continueWithTask { task ->
             if (!task.isSuccessful) {

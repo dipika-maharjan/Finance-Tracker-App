@@ -17,6 +17,7 @@ import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
 import com.github.mikephil.charting.formatter.PercentFormatter
 import com.talhaatif.financeapk.databinding.FragmentHomeBinding
+import com.talhaatif.financeapk.firebase.Util
 import com.talhaatif.financeapk.models.BudgetModel
 import com.talhaatif.financeapk.viewmodel.HomeViewModel
 
@@ -24,6 +25,7 @@ class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
+
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var pieChart: PieChart
 
@@ -41,6 +43,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if(checkAllParameters()){
+
             binding.fab.setOnClickListener {
 
                 val intent = Intent(requireActivity(), AddTransactions::class.java)
@@ -69,7 +72,7 @@ class HomeFragment : Fragment() {
         if (budget == null) return
 
         binding.tvBalanceAmount.text = budget.balance.toString()
-        binding.tvIncomeAmount.text = budget.income.toString()
+        binding.tvIncomeAmount.text =  budget.income.toString()
         binding.tvExpenseAmount.text = budget.expense.toString()
     }
 

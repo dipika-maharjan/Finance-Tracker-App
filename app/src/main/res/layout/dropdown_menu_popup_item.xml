@@ -4,4 +4,5 @@
     android:layout_height="wrap_content"
     android:padding="16dp"
     android:textSize="16sp"
-    android:textColor="@color/blue_200" />
+    style="@style/TextAppearance.AppCompat.Widget.TextView.SpinnerItem"
+    android:textColor="@color/white" />

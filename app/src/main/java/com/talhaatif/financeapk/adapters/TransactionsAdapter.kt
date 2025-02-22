@@ -71,6 +71,9 @@ class TransactionsAdapter(private var groupedTransactions: Map<String, List<Tran
     class TransactionViewHolder(private val binding: RvTransactionsBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(transaction: Transaction) {
+            binding.transactionView.setImageResource(
+                if (transaction.transType == "Income") R.drawable.ic_positive_amount else R.drawable.ic_negative_transaction
+            )
             binding.transactionType.text = transaction.transType
             binding.transactionAmount.text = transaction.transAmount
             binding.transactionDate.text = transaction.transDate

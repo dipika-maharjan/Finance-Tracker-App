@@ -19,8 +19,8 @@ class AuthViewModel : ViewModel() {
         password: String,
         name: String,
         currency: String,
-        imageUri: Uri,
-        bitmap: Bitmap
+        imageUri: Uri?,
+        bitmap: Bitmap?
     ) {
         repository.signUp(context, email, password, name, currency, imageUri, bitmap)
     }

@@ -2,6 +2,7 @@ package com.talhaatif.financeapk
 
 
 import android.app.ProgressDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,9 +20,9 @@ import com.talhaatif.financeapk.viewmodel.ProfileViewModel
 
 class ProfileFragment : Fragment() {
     private lateinit var binding: FragmentProfileBinding
-//    private lateinit var progressDialog: ProgressDialog
     private lateinit var profileViewModel: ProfileViewModel
     private var imgChange = false
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,10 +39,16 @@ class ProfileFragment : Fragment() {
             this, ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
         )[ProfileViewModel::class.java]
 
-//        progressDialog = ProgressDialog(requireContext()).apply {
-//            setMessage("Fetching profile...")
-//            show()
-//        }
+
+        binding.logout.setOnClickListener {
+            profileViewModel.logout()
+            Toast.makeText(requireContext(), "Logged out", Toast.LENGTH_SHORT).show()
+            val intent = Intent(requireActivity(), LoginActivity::class.java)
+            // to clear previous all activities from the stack
+            intent.flags=Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            requireActivity().finish()
+        }
 
 
         profileViewModel.fetchUserProfile()
@@ -49,10 +56,23 @@ class ProfileFragment : Fragment() {
 
         binding.update.setOnClickListener {
             val name = binding.name.text.toString()
-            val currency = binding.currencySelector.text.toString()
+            var currency = binding.currencySelector.text.toString()
+
+            currency = if(currency.equals("PKR",true)){
+                "Rs"
+            } else if(currency.equals("INR",true)){
+                "₹"
+            } else if(currency.equals("EUR",true)) {
+                "€"
+            } else if(currency.equals("GBP",true)){
+                "£"
+            } else{
+                "$"
+            }
+
             val bitmap = binding.imageView.drawable?.toBitmap()
-//            progressDialog.setMessage("Updating...")
-//            progressDialog.show()
+
+
             profileViewModel.updateUserProfile(name, currency, bitmap, imgChange)
         }
     }
@@ -60,13 +80,29 @@ class ProfileFragment : Fragment() {
     private fun observeViewModel() {
         profileViewModel.profileData.observe(viewLifecycleOwner, Observer { data ->
             binding.name.setText(data["name"])
-            val currency = data["currency"] ?: ""
             val currencies = listOf("USD", "EUR", "PKR", "INR", "GBP").toMutableList()
-            if (currencies.contains(currency)) currencies.remove(currency)
-            currencies.add(0, currency)
             binding.currencySelector.setAdapter(
-                ArrayAdapter(requireContext(), R.layout.dropdown_menu_popup_item, currencies)
-            )
+                ArrayAdapter(requireContext(), R.layout.dropdown_menu_popup_item, currencies))
+
+            var selectedCurrency = profileViewModel.getCurrency()
+            if(selectedCurrency .equals("Rs")){
+                selectedCurrency  = "PKR"
+            }
+            else if(selectedCurrency .equals("₹")){
+                selectedCurrency  = "INR"
+            }
+            else if(selectedCurrency .equals("€")){
+                selectedCurrency = "EUR"
+            }
+            else if(selectedCurrency .equals("£")){
+                selectedCurrency  = "GBP"
+            }
+            else {
+                selectedCurrency = "USD"
+            }
+
+            binding.currencySelector.setText(selectedCurrency, false)
+
             Glide.with(this).load(data["image"]).into(binding.imageView)
         })
 

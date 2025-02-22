@@ -1,4 +1,5 @@
 package com.talhaatif.financeapk
+
 import android.app.DatePickerDialog
 import android.app.Dialog
 import android.os.Bundle
@@ -14,9 +15,17 @@ class DatePickerFragment(private val dateSetListener: (year: Int, month: Int, da
         val month = c.get(Calendar.MONTH)
         val day = c.get(Calendar.DAY_OF_MONTH)
 
-        // Create a new instance of DatePickerDialog and return it
-        return DatePickerDialog(requireActivity(), { _, selectedYear, selectedMonth, selectedDay ->
-            dateSetListener(selectedYear, selectedMonth, selectedDay)
-        }, year, month, day)
+        // Create a new instance of DatePickerDialog with the custom theme
+        val datePickerDialog = DatePickerDialog(
+            requireActivity(),
+            { _, selectedYear, selectedMonth, selectedDay ->
+                dateSetListener(selectedYear, selectedMonth, selectedDay)
+            },
+            year,
+            month,
+            day
+        )
+
+        return datePickerDialog
     }
 }

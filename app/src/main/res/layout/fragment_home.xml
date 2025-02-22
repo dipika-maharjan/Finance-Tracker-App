@@ -64,7 +64,7 @@
                         android:id="@+id/tvBalanceAmount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="$100"
+                        android:text="0"
                         android:textSize="24sp"
                         android:textStyle="bold"
                         android:layout_gravity="center" />
@@ -76,7 +76,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:background="@color/blue_200"
+                android:background="@color/purple_200"
                 >
 
                 <!-- Income Card -->
@@ -86,7 +86,7 @@
                     android:layout_marginBottom="16dp"
                     android:padding="16dp"
                     android:layout_weight="1"
-                    android:background="@android:color/white"
+                    android:background="@color/purple_200"
                     app:cardCornerRadius="8dp"
                     app:cardElevation="4dp">
 
@@ -111,7 +111,7 @@
                             android:id="@+id/tvIncomeAmount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="$100"
+                            android:text="0"
                             style="@style/TextAppearance.AmountIncome"
                             android:textSize="24sp"
                             android:textStyle="bold"
@@ -128,7 +128,7 @@
                     android:layout_marginBottom="16dp"
                     android:padding="16dp"
                     android:layout_marginStart="5sp"
-                    android:background="@android:color/white"
+                    android:background="@color/purple_200"
                     app:cardCornerRadius="8dp"
                     app:cardElevation="4dp">
 
@@ -154,7 +154,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             style="@style/TextAppearance.AmountExpense"
-                            android:text="$100"
+                            android:text="0"
                             android:textSize="24sp"
                             android:textStyle="bold"
                             android:layout_gravity="center" />

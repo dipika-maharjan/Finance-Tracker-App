@@ -3,6 +3,7 @@ package com.talhaatif.financeapk.firebase
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.net.Uri
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -25,6 +26,22 @@ class Variables {
         fun isEmailValid(email: String): Boolean {
             val emailRegex = Regex("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")
             return emailRegex.matches(email)
+        }
+
+        fun getRandomAvatar(context: Context): Uri {
+            // List of avatar resource names
+            val avatars = listOf(
+                "avatar1", "avatar2", "avatar3", "avatar4", "avatar5", "avatar6", "avatar7"
+            )
+
+            // Randomly select an avatar
+            val randomAvatar = avatars.random()
+
+            // Get the resource ID of the selected avatar
+            val resourceId = context.resources.getIdentifier(randomAvatar, "drawable", context.packageName)
+
+            // Convert the drawable resource ID to a URI
+            return Uri.parse("android.resource://${context.packageName}/$resourceId")
         }
     }
 }
