@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "297803469623",
-    "project_id": "financeapk-7296f",
-    "storage_bucket": "financeapk-7296f.appspot.com"
+    "project_number": "1016243503026",
+    "project_id": "finance-tracker-app-d609d",
+    "storage_bucket": "finance-tracker-app-d609d.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:297803469623:android:d3543279f4168a9a6100b2",
+        "mobilesdk_app_id": "1:1016243503026:android:77549cd5babca6ca262eab",
         "android_client_info": {
           "package_name": "com.talhaatif.financeapk"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBteBr062qSxrFgvQKA4UU4NBM0PrJqOfM"
+          "current_key": "AIzaSyDo3Z75b8XhuTb4iMrQ6eG9L-AJSBhCDdE"
         }
       ],
       "services": {

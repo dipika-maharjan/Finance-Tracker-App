@@ -15,6 +15,8 @@ import com.github.mikephil.charting.utils.ColorTemplate
 import com.talhaatif.financeapk.databinding.FragmentAnalysisBinding
 import com.talhaatif.financeapk.firebase.Util
 import com.talhaatif.financeapk.firebase.Variables.Companion.db
+import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.DocumentSnapshot
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -28,13 +30,12 @@ class AnalysisFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentAnalysisBinding.inflate(inflater, container, false)
-
         return binding.root
     }
+
     private fun checkAllParameters(): Boolean {
         return isAdded && context != null
     }
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -50,11 +51,25 @@ class AnalysisFragment : Fragment() {
         db.collection("budget")
             .whereEqualTo("uid", userId)
             .get()
-            .addOnSuccessListener { documents ->
+            .addOnSuccessListener { documents: QuerySnapshot -> // Fix: Explicit type added
                 val entries = mutableListOf<PieEntry>()
-                for (document in documents) {
-                    val income = document.getDouble("income")?.toFloat() ?: 0f
-                    val expense = document.getDouble("expense")?.toFloat() ?: 0f
+                for (document: DocumentSnapshot in documents) { // Fix: Explicit type added
+                    Log.d("FirestoreData", "Document: ${document.data}")
+
+                    val income: Float = when (val incomeValue = document.get("income")) {
+                        is Number -> incomeValue.toFloat()
+                        is String -> incomeValue.toFloatOrNull() ?: 0f
+                        else -> 0f
+                    }
+
+                    val expense: Float = when (val expenseValue = document.get("expense")) {
+                        is Number -> expenseValue.toFloat()
+                        is String -> expenseValue.toFloatOrNull() ?: 0f
+                        else -> 0f
+                    }
+
+                    Log.d("FirestoreParsed", "Income: $income, Expense: $expense")
+
                     if (income > 0) {
                         entries.add(PieEntry(income, "Income"))
                     }
@@ -65,10 +80,9 @@ class AnalysisFragment : Fragment() {
                 if (isAdded) {
                     setupPieChart(entries)
                 }
-
             }
             .addOnFailureListener { exception ->
-                Log.w("AnalysisFragment", "Error getting budget: ", exception)
+                Log.e("AnalysisFragment", "Error getting budget: ", exception)
             }
     }
 
@@ -83,7 +97,7 @@ class AnalysisFragment : Fragment() {
 
         data.setValueFormatter(object : ValueFormatter() {
             override fun getFormattedValue(value: Float): String {
-                return value.toInt().toString() + "%"
+                return "${value.toInt()}%"
             }
 
             override fun getPieLabel(value: Float, pieEntry: PieEntry?): String {
@@ -92,7 +106,7 @@ class AnalysisFragment : Fragment() {
         })
         binding.pieChart.data = data
         binding.pieChart.setUsePercentValues(true)
-        binding.pieChart.invalidate() // refresh
+        binding.pieChart.invalidate() // refresh chart
     }
 
     private fun setupDatePicker() {
@@ -117,13 +131,14 @@ class AnalysisFragment : Fragment() {
             .whereEqualTo("uid", userId)
             .whereEqualTo("transDate", selectedDate)
             .get()
-            .addOnSuccessListener { documents ->
+            .addOnSuccessListener { documents: QuerySnapshot -> // Fix: Explicit type added
                 val entries = mutableListOf<PieEntry>()
                 var totalIncome = 0f
                 var totalExpense = 0f
-                for (document in documents) {
+                for (document: DocumentSnapshot in documents) { // Fix: Explicit type added
                     val transType = document.getString("transType")
                     val transAmount = document.getString("transAmount")?.split(" ")?.first()?.toFloatOrNull() ?: 0f
+
                     if (transType == "Income") {
                         totalIncome += transAmount
                     } else if (transType == "Expense") {
@@ -139,8 +154,7 @@ class AnalysisFragment : Fragment() {
                 setupPieChart(entries)
             }
             .addOnFailureListener { exception ->
-                Log.w("AnalysisFragment", "Error getting transactions: ", exception)
+                Log.e("AnalysisFragment", "Error getting transactions: ", exception)
             }
     }
-
 }

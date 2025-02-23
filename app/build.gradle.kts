@@ -41,22 +41,28 @@ android {
 
 dependencies {
     implementation ("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
     implementation(libs.androidx.core.ktx)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+
     implementation(libs.androidx.appcompat)
-    implementation ("androidx.fragment:fragment-ktx:1.6.1")
+    implementation("androidx.fragment:fragment-ktx:1.6.1")
     implementation(libs.material)
-    implementation (libs.glide)
+    implementation(libs.glide)
+
+    // Firebase dependencies
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.database)
+    implementation("com.google.firebase:firebase-storage-ktx:20.3.0") // ✅ For Storage
+    implementation("com.google.firebase:firebase-firestore-ktx:24.9.1") // ✅ For Firestore
+
     annotationProcessor (libs.compiler)
     implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.firebase.firestore)
-    implementation(libs.firebase.storage)
-    implementation(libs.firebase.auth.ktx)
-    implementation(libs.firebase.storage.ktx)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
     implementation(libs.circleimageview)
 }
